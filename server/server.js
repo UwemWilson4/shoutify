@@ -14,8 +14,12 @@ const cors = require("cors");
 var request = require("request");
 const express = require("express");
 const http = require("http");
+const mongoose = require("mongoose");
 
 const PORT = process.env.PORT || 4000;
+const mongoUri =
+  process.env.MONGO_URI ||
+  "mongodb://user:pass@127.0.0.1:27017/mydatabase?authSource=admin";
 const app = express();
 const server = http.createServer(app);
 
@@ -185,4 +189,15 @@ app.get("/logout", (req, res) => {
 	res.status(200).send("logged out");
 });
 
-server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+const startApp = async () => {
+	try {
+		await mongoose.connect(mongoUri);
+		server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+	} catch (e) {
+		console.error(`Failed to start app with error: ${e}`);
+	}
+}
+
+startApp()
+
+

@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
+    "env": "docker-compose up",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
@@ -19,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/UwemWilson4/shoutify/issues"
   },
-  "homepage": "https://github.com/UwemWilson4/shoutify#readme"
+  "homepage": "https://github.com/UwemWilson4/shoutify#readme",
+  "dependencies": {
+    "mongoose": "^6.9.2"
+  }
 }
