@@ -1,3 +1,5 @@
+const routes = require("./routes")
+
 if (process.env.NODE_ENV !== "production") {
 	require("dotenv").config();
 }
@@ -23,7 +25,7 @@ const mongoUri =
 const app = express();
 const server = http.createServer(app);
 
-var corsOptions = {
+const corsOptions = {
 	origin: [process.env.FRONT_URI, process.env.REXP],
 	credentials: true,
 };
@@ -41,6 +43,7 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(routes);
 
 const redirect_uri = process.env.RE_URI;
 const front_end_uri = process.env.FRONT_URI;
