@@ -67,7 +67,7 @@ export default function Icon(props) {
         case 'Pause':
             return <Pause />
         case 'Social':
-            return <Social/>
+            return <Social />
         default:
             return null
     }
