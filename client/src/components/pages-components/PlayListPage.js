@@ -11,6 +11,7 @@ import {TokenContext, LoginContext, MessageContext, PlayContext} from '../../uti
 import useId from '../../utilities/hooks/useId'
 import useInfiScroll from '../../utilities/hooks/useInfiScroll'
 import putWithToken from '../../utilities/putWithToken'
+import requestWithToken from '../../utilities/requestWithToken'
 
 export default function PlayListPage({playlists, refreshPlaylist}) {
     const id = useId('playlist')
@@ -54,16 +55,35 @@ export default function PlayListPage({playlists, refreshPlaylist}) {
         if (id){
             makeRequest()
             .then((data) => {
-                const {name, description, owner, followers, primary_color, tracks, images, uri} = data
-                setbannerInfo(bannerInfo => ({...bannerInfo, name, description, user:[owner], followers, primary_color, images}))
-                setTracks(tracks.items.map((track) => track.track))
-                setNext(tracks.next)
-                setUri(uri)
-                setLoading(false)
+                try {
+                    console.log(data);
+                    const {name, description, owner, followers, primary_color, tracks, images, uri} = data;
+                    setbannerInfo(bannerInfo => ({...bannerInfo, name, description, user:[owner], followers, primary_color, images}))
+                    setTracks(tracks.items.map((track) => track.track))
+                    setNext(tracks.next)
+                    setUri(uri)
+                    setLoading(false)
+
+                } catch (error) {
+                    requestWithToken(`https://api.spotify.com/v1/playlists/${id}`, token, source)
+                        .then(response => {
+                            console.log(response)
+                            const {name, description, owner, followers, primary_color, tracks, images, uri} = response.data;
+                            
+                            setbannerInfo(bannerInfo => ({...bannerInfo, name, description, user:[owner], followers, primary_color, images}))
+                            setTracks(tracks.items.map((track) => track.track))
+                            setNext(tracks.next)
+                            setUri(uri)
+                            setLoading(false)
+                        })
+                        .catch(error => console.log(error))
+                }
+                
             })
             .catch((error) => {
+                console.log(error);
                 setLoading(false)
-                setMessage(`ERROR: ${error}`)
+                setMessage(`ERROR: line 66 playlistpage ${error}`)
             })
         }
         
@@ -85,8 +105,7 @@ export default function PlayListPage({playlists, refreshPlaylist}) {
     }, [id, loggedIn])
 
     const followPlaylist = () => {
-        const followReq = putWithToken(`https://api.spotify.com/v1/playlists/${id}/followers`, token, source, {}, like?'DELETE':'PUT')
-        followReq()
+        putWithToken(`https://api.spotify.com/v1/playlists/${id}/followers`, token, source, {}, like?'DELETE':'PUT')
             .then(response => {
                 if (response.status === 200){
                     if(like){
@@ -100,15 +119,14 @@ export default function PlayListPage({playlists, refreshPlaylist}) {
                     setMessage(`ERROR: Something went wrong! Server response: ${response.status}`)
                 }
             })
-            .catch(error => setMessage(`ERROR: ${error}`))
+            .catch(error => setMessage(`ERROR: line 103 playlist page ${error}`))
     }
 
     const playContext = () => {
         const body = {
             context_uri: uri
         }
-        const request = putWithToken(`https://api.spotify.com/v1/me/player/play`, token, source, body)
-        request()
+        putWithToken(`https://api.spotify.com/v1/me/player/play`, token, source, body)
             .then(response => {
                 if (response.status === 204){
                     setTimeout(() => updatePlayer(), 500)
@@ -124,8 +142,7 @@ export default function PlayListPage({playlists, refreshPlaylist}) {
             context_uri: uri,
             offset: {uri: trackUri}
         }
-        const request = putWithToken(`https://api.spotify.com/v1/me/player/play`, token, source, body)
-        request()
+        putWithToken(`https://api.spotify.com/v1/me/player/play`, token, source, body)
             .then(response => {
                 if (response.status === 204){
                     setTimeout(() => updatePlayer(), 500)

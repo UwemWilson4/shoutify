@@ -3,7 +3,7 @@ import axios from "axios";
 
 import ConnectDevicesItem from "./ConnectDevicesItem";
 
-import reqWithToken from "../../utilities/reqWithToken";
+import requestWithToken from "../../utilities/requestWithToken";
 import putWithToken from "../../utilities/putWithToken";
 
 const ConnectDevices = ({ token, closeTip }) => {
@@ -11,14 +11,8 @@ const ConnectDevices = ({ token, closeTip }) => {
 
 	const source = axios.CancelToken.source();
 	useEffect(() => {
-		const requestDevices = reqWithToken(
-			"https://api.spotify.com/v1/me/player/devices",
-			token,
-			source
-		);
-
 		window.addEventListener("click", clickExit);
-		requestDevices()
+		requestWithToken("https://api.spotify.com/v1/me/player/devices", token, source)
 			.then((response) => {
 				const _devices = response.data.devices;
 				setDevices(_devices);
@@ -39,15 +33,10 @@ const ConnectDevices = ({ token, closeTip }) => {
 	};
 
 	const switchDevice = (e) => {
+		console.log(e);
 		const id = e.currentTarget.dataset.id;
 		const data = { device_ids: [id] };
-		const reqTransfer = putWithToken(
-			"https://api.spotify.com/v1/me/player",
-			token,
-			source,
-			data
-		);
-		reqTransfer()
+		putWithToken("https://api.spotify.com/v1/me/player", token, source, data)
 			.then((response) => {
 				if (response.status === 204) {
 					closeTip();

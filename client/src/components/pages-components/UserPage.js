@@ -9,7 +9,7 @@ import Loading from '../featured-components/Loading'
 import useId from '../../utilities/hooks/useId'
 import useInfiScroll from '../../utilities/hooks/useInfiScroll'
 import {UserContext, TokenContext, LoginContext, MessageContext} from '../../utilities/context'
-import reqWithToken from '../../utilities/reqWithToken'
+import requestWithToken from '../../utilities/requestWithToken'
 import putWithToken from '../../utilities/putWithToken'
 import makeAxiosRequest from '../../utilities/makeAxiosRequest'
 
@@ -73,8 +73,7 @@ export default function UserPage({query, setMessage}) {
         }
         
         if (loggedIn && id){
-            const requestFollow = reqWithToken(`https://api.spotify.com/v1/me/following/contains?type=user&ids=${id}`, token, source)
-            requestFollow()
+            requestWithToken(`https://api.spotify.com/v1/me/following/contains?type=user&ids=${id}`, token, source)
                 .then(response => {
                     setFollow(response.data[0])
                 })
@@ -91,8 +90,7 @@ export default function UserPage({query, setMessage}) {
 
     const followUser = () => {
         if (loggedIn) {
-            const request = putWithToken(`https://api.spotify.com/v1/me/following?type=user&ids=${id}`, token, source, {}, follow? 'DELETE':'PUT')
-            request()
+            putWithToken(`https://api.spotify.com/v1/me/following?type=user&ids=${id}`, token, source, {}, follow? 'DELETE':'PUT')
                 .then(response => {
                     if (response.status === 204){
                         if (follow){
